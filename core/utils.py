@@ -303,27 +303,29 @@ def save_jsonl_file(path, data):
 
 
 def parse_json(text: str) -> dict:
-    # 查找字符串中的 JSON 块
-    start = text.find("```json")
-    end = text.find("```", start + 7)
-    
-    # 如果找到了 JSON 块
-    if start != -1 and end != -1:
-        json_string = text[start + 7: end]
-        
-        try:
-            # 解析 JSON 字符串
-            json_data = json.loads(json_string)
-            valid = check_selector_response(json_data)
-            if valid:
-                return json_data
-            else:
-                return {}
-        except:
-            print(f"error: parse json error!\n")
-            print(f"json_string: {json_string}\n\n")
-            pass
-    
+    # Prefer a Markdown JSON block when present, but also accept bare JSON.
+    fenced_json = re.search(r"```json\s*(.*?)```", text, re.IGNORECASE | re.DOTALL)
+    if fenced_json:
+        json_string = fenced_json.group(1).strip()
+    else:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start == -1 or end == -1 or start > end:
+            return {}
+        json_string = text[start:end + 1]
+
+    try:
+        json_data = json.loads(json_string)
+    except (json.JSONDecodeError, TypeError):
+        print("error: parse json error!\n")
+        print(f"json_string: {json_string}\n\n")
+        return {}
+
+    if not isinstance(json_data, dict):
+        return {}
+
+    if check_selector_response(json_data):
+        return json_data
     return {}
 
 

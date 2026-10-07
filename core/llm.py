@@ -1,7 +1,10 @@
 import sys
 import json
 import time
-from core.api_config import *
+import os
+from openai import OpenAI
+
+MODEL_NAME = os.environ.get("DEEPSEEK_MODEL", "deepseek-flash")
 
 MAX_TRY = 5
 
@@ -29,26 +32,42 @@ def init_log_path(my_log_path):
     api_trace_json_path = os.path.join(dir_name, 'api_trace.json')
 
 
-def api_func(prompt:str):
-    global MODEL_NAME
-    print(f"\nUse OpenAI model: {MODEL_NAME}\n")
-    if 'Llama' in MODEL_NAME:
-        openai.api_version = None
-        openai.api_type = "open_ai"
-        openai.api_key = "EMPTY"
-        response = openai.ChatCompletion.create(
+def api_func(prompt: str):
+    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    if not api_key:
+        raise RuntimeError("请先设置 DEEPSEEK_API_KEY 环境变量")
+
+    print(f"\nUse DeepSeek model: {MODEL_NAME}\n")
+
+    with OpenAI(
+        api_key=api_key,
+        base_url="https://api.deepseek.com",
+        timeout=120.0,
+        max_retries=0,
+    ) as client:
+        response = client.chat.completions.create(
             model=MODEL_NAME,
-            messages=[{"role": "user", "content": prompt}]
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=10000,
+            stream=False,
         )
-    else:
-        response = openai.ChatCompletion.create(
-            engine=MODEL_NAME,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.1
-        )
-    text = response['choices'][0]['message']['content'].strip()
-    prompt_token = response['usage']['prompt_tokens']
-    response_token = response['usage']['completion_tokens']
+
+    if response.choices[0].finish_reason == "length":
+        raise RuntimeError("模型回答被截断，请检查输出长度限制")
+
+    answer = response.choices[0].message.content
+    if not answer or not answer.strip():
+        raise RuntimeError("模型返回了空回答")
+
+    if response.usage is None:
+        raise RuntimeError("接口未返回 token 用量")
+
+    text = answer.strip()
+    prompt_token = response.usage.prompt_tokens
+    response_token = response.usage.completion_tokens
+
     return text, prompt_token, response_token
 
 
