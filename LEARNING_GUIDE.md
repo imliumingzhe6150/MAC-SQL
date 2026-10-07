@@ -4,7 +4,12 @@
 >
 > 建议用 10 个学习日完成，每天约 1–2 小时；调试和实验可能需要额外时间。按阶段验收，不必按日历赶进度。
 >
-> 编写日期：2026-10-02。源码定位依据桌面 MAC-SQL 仓库的提交 `31a9df5e0d520be4769be57a4b9022e5e34a14f4`。下文明确区分“官方实现”与“建议你实现的学习版”；这份指南没有替你运行模型或完成实验。
+> 下文明确区分“官方实现”与“建议你实现的学习版”；这份指南没有替你运行模型或完成实验。
+
+## 当前学习进度（2026-10-05）
+
+- 阶段 A：源码阅读已完成（按你的反馈）。[交付物与过关参考答案](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/learning/STAGE_A_DELIVERABLES.md>)；[流程图 PNG](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/learning/stage_a_flowchart.png>)。
+- 阶段 B：已进入首题准备，数据与 Schema 检查通过；尚未进行真实模型调用。[首题实践说明](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/learning/STAGE_B_FIRST_LESSON.md>)。
 
 ## 1. 你的起点，以及这次要学会什么
 
@@ -18,13 +23,13 @@
 
 这些工作可以直接继承。MAC-SQL 阶段最重要的新增能力是：**控制模型看到的 Schema、管理共享状态和路由、用数据库执行反馈驱动有限次修复，以及用消融实验判断模块是否有用。**
 
-| 已有基础 | 本阶段需要补上的能力 | 可检查的证据 |
-| --- | --- | --- |
-| Schema linking | 筛选后实际传给模型哪些表、列、主外键 | 筛选前后 Schema 与遗漏分析 |
+| 已有基础            | 本阶段需要补上的能力                       | 可检查的证据                     |
+| ------------------- | ------------------------------------------ | -------------------------------- |
+| Schema linking      | 筛选后实际传给模型哪些表、列、主外键       | 筛选前后 Schema 与遗漏分析       |
 | 问题分解与 SQL 生成 | 理解 MAC-SQL 分解提示和最终 SQL 的提取方式 | 复杂题的子问题、子 SQL、最终 SQL |
-| Self-correction | 读取真实 SQLite 反馈，修复后再次执行 | 完整修复轨迹 |
-| 固定四阶段串联 | 维护状态、条件路由、停止条件 | 无模型也能验证的状态机 |
-| baseline 对照 | 分离 Selector、Refiner 的贡献与成本 | 消融表、逐题变化、调用统计 |
+| Self-correction     | 读取真实 SQLite 反馈，修复后再次执行       | 完整修复轨迹                     |
+| 固定四阶段串联      | 维护状态、条件路由、停止条件               | 无模型也能验证的状态机           |
+| baseline 对照       | 分离 Selector、Refiner 的贡献与成本        | 消融表、逐题变化、调用统计       |
 
 **毕业不要求超过 90%，也不要求复现论文分数。** 如果 MAC-SQL 没有提升，而你能可靠地解释原因、展示控制流程和实验依据，仍然可以毕业。
 
@@ -68,17 +73,17 @@
 
 第一遍只追踪一个问题怎样流转，不必先读完数据预处理、所有示例和评测器。
 
-| 顺序 | 阅读入口 | 带着什么问题读 |
-| --- | --- | --- |
-| 1 | [run.py：init_spider_message、run_batch](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/run.py:14>) | 初始消息包含什么？如何逐题运行、保存和恢复？ |
-| 2 | [chat_manager.py：start、_chat_single_round](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/chat_manager.py:46>) | 谁决定下一个角色？一轮循环可能调用几个角色？ |
-| 3 | [agents.py：Selector.talk](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/agents.py:552>) | 何时筛选？输出 Schema 写入哪些字段？ |
-| 4 | [agents.py：Decomposer.talk](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/agents.py:610>) | 怎样组装 prompt、提取 SQL、转交 Refiner？ |
-| 5 | [agents.py：Refiner](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/agents.py:661>) | 执行、判定、修改、再次执行分别在哪里？ |
-| 6 | [const.py：三类提示词](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/const.py:15>) | Selector 看什么示例？Spider 的分解示例怎样组织？Refiner 收到什么错误信息？ |
-| 7 | [utils.py：parse_json、parse_sql_from_string](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/utils.py:305>) | 输出不符合格式时，系统会怎样退化或停止？ |
-| 8 | [agents.py：_get_db_desc_str、_is_need_prune](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/agents.py:416>) | 模型的选择决定如何变成真实上下文？哪些规则会补回列？ |
-| 9 | [llm.py](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/llm.py:1>) 与模型配置文件 | API 调用、有限重试、token 统计和日志怎样封装？ |
+| 顺序 | 阅读入口                                                                                                                | 带着什么问题读                                                             |
+| ---- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 1    | [run.py：init_spider_message、run_batch](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/run.py:14>)                   | 初始消息包含什么？如何逐题运行、保存和恢复？                               |
+| 2    | [chat_manager.py：start、_chat_single_round](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/chat_manager.py:46>) | 谁决定下一个角色？一轮循环可能调用几个角色？                               |
+| 3    | [agents.py：Selector.talk](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/agents.py:552>)                        | 何时筛选？输出 Schema 写入哪些字段？                                       |
+| 4    | [agents.py：Decomposer.talk](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/agents.py:610>)                      | 怎样组装 prompt、提取 SQL、转交 Refiner？                                  |
+| 5    | [agents.py：Refiner](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/agents.py:661>)                              | 执行、判定、修改、再次执行分别在哪里？                                     |
+| 6    | [const.py：三类提示词](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/const.py:15>)                              | Selector 看什么示例？Spider 的分解示例怎样组织？Refiner 收到什么错误信息？ |
+| 7    | [utils.py：parse_json、parse_sql_from_string](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/utils.py:305>)      | 输出不符合格式时，系统会怎样退化或停止？                                   |
+| 8    | [agents.py：_get_db_desc_str、_is_need_prune](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/agents.py:416>)     | 模型的选择决定如何变成真实上下文？哪些规则会补回列？                       |
+| 9    | [llm.py](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/core/llm.py:1>) 与模型配置文件                                | API 调用、有限重试、token 统计和日志怎样封装？                             |
 
 每读一个角色，写下五项：**输入、输出、工具、下一跳、失败处理**。如果这五项还说不清，先不要增加框架或功能。
 
@@ -165,14 +170,14 @@
 
 **修复练习：对已知正确的 SQL 人工制造问题**
 
-| 故障 | 应观察到的行为 | 验证目标 |
-| --- | --- | --- |
-| 拼错列名 | 记录 SQLite 错误，进入修复，再次执行 | 错误信息是否用于修改 |
-| 括号或语法损坏 | 同上 | 至少保存一条修复成功轨迹 |
-| 修复后仍然报错 | 继续到上限，明确失败退出 | 循环有界，最终状态可靠 |
-| SQL 能执行，但漏掉 WHERE | 可能直接结束 | 能解释执行反馈的语义盲区 |
-| 合法空结果 | 正常结束，不强行“修出数据” | 不误判正常查询 |
-| 执行工具超时 | 标记超时并结束或按已定义策略处理 | 不当作成功，不因异常变量缺失崩溃 |
+| 故障                     | 应观察到的行为                       | 验证目标                         |
+| ------------------------ | ------------------------------------ | -------------------------------- |
+| 拼错列名                 | 记录 SQLite 错误，进入修复，再次执行 | 错误信息是否用于修改             |
+| 括号或语法损坏           | 同上                                 | 至少保存一条修复成功轨迹         |
+| 修复后仍然报错           | 继续到上限，明确失败退出             | 循环有界，最终状态可靠           |
+| SQL 能执行，但漏掉 WHERE | 可能直接结束                         | 能解释执行反馈的语义盲区         |
+| 合法空结果               | 正常结束，不强行“修出数据”         | 不误判正常查询                   |
+| 执行工具超时             | 标记超时并结束或按已定义策略处理     | 不当作成功，不因异常变量缺失崩溃 |
 
 循环上限和超时路径可以先用固定响应或模拟执行工具检查，避免依赖模型偶然产生错误。真实修复另外保留一次端到端演示。
 
@@ -258,14 +263,12 @@ NESTED:     12, 28, 30, 31, 41, 43, 59, 61, 65, 85
 
 ### 6.2 最小对照矩阵
 
-| 配置 | 原 30 题 | 新 15 题 | 要回答的问题 |
-| --- | --- | --- | --- |
-| 直接生成 baseline | 必做，可有条件复用旧结果 | 必做 | 完整系统是否值得增加复杂度？ |
-| DIN-SQL 简化实现 | 保留原结果作参照 | 选做 | 与上一阶段相比有什么变化？ |
-| MAC-SQL 学习版完整流程 | 必做 | 必做 | 本阶段主要结果 |
-| MAC-SQL 关闭 Selector | 必做 | 选做 | 筛选的收益、遗漏与成本 |
-| MAC-SQL 关闭 Refiner | 必做，可复用完整流程初始 SQL | 选做 | 执行反馈到底改进了什么？ |
-| MAC-SQL 去掉分解提示 | 选做 | 选做 | 分解提示是否帮助复杂题？ |
+| 配置                   | 原 30 题                     | 新 15 题 | 要回答的问题                 |
+| ---------------------- | ---------------------------- | -------- | ---------------------------- |
+| 直接生成 baseline      | 必做，可有条件复用旧结果     | 必做     | 完整系统是否值得增加复杂度？ |
+| DIN-SQL 简化实现       | 保留原结果作参照             | 选做     | 与上一阶段相比有什么变化？   |
+| MAC-SQL 学习版完整流程 | 必做                         | 必做     | 本阶段主要结果               |
+| MAC-SQL 关闭 Refiner   | 必做，可复用完整流程初始 SQL | 选做     | 执行反馈到底改进了什么？     |
 
 关闭 Refiner 时，用完整运行保存的初始 SQL 做配对评测，能避免重新生成带来的随机差异；标注这是配对消融。它的费用只计到初始生成结束。
 
@@ -284,30 +287,30 @@ NESTED:     12, 28, 30, 31, 41, 43, 59, 61, 65, 85
 
 ### 6.4 至少记录的指标
 
-| 指标 | 定义或记录方式 |
-| --- | --- |
-| 执行成功率 | 最终 SQL 执行成功题数 / 全部计划题数 |
-| 结果匹配率 | 最终完整结果与 Gold 匹配题数 / 全部计划题数 |
-| 分组匹配率 | 沿用三组标签，分别报告计数和比例 |
-| 筛选触发情况 | 触发筛选、实际调用筛选模型、回退分别有多少题 |
-| Schema 压缩 | `1 - 筛选后 Schema token / 筛选前 Schema token`，说明统计范围和 tokenizer |
-| 必要 Schema 保留情况 | 在人工审查题上检查必要表、列与连接路径，说明标注依据 |
-| 修复效果 | 初始与最终执行状态、匹配状态；修复调用次数 |
-| 修复净收益 | 初始错→最终对、初始对→最终错分别计数，再报告净变化 |
-| 执行错误恢复率 | 初始执行报错且最终可执行的题数 / 初始执行报错题数；另报其中最终匹配数 |
-| 成本与延迟 | 每题总调用次数、输入/输出 token、端到端耗时；费用注明计价日期，无可靠价格时只报 token |
+| 指标                 | 定义或记录方式                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| 执行成功率           | 最终 SQL 执行成功题数 / 全部计划题数                                                  |
+| 结果匹配率           | 最终完整结果与 Gold 匹配题数 / 全部计划题数                                           |
+| 分组匹配率           | 沿用三组标签，分别报告计数和比例                                                      |
+| 筛选触发情况         | 触发筛选、实际调用筛选模型、回退分别有多少题                                          |
+| Schema 压缩          | `1 - 筛选后 Schema token / 筛选前 Schema token`，说明统计范围和 tokenizer           |
+| 必要 Schema 保留情况 | 在人工审查题上检查必要表、列与连接路径，说明标注依据                                  |
+| 修复效果             | 初始与最终执行状态、匹配状态；修复调用次数                                            |
+| 修复净收益           | 初始错→最终对、初始对→最终错分别计数，再报告净变化                                  |
+| 执行错误恢复率       | 初始执行报错且最终可执行的题数 / 初始执行报错题数；另报其中最终匹配数                 |
+| 成本与延迟           | 每题总调用次数、输入/输出 token、端到端耗时；费用注明计价日期，无可靠价格时只报 token |
 
 Selector 自身也消耗 token，所以 Schema 变短不等于总费用下降。统计完整流程，包括修复与重试；若服务不返回 token，注明估算方法。
 
 建议的结果表：
 
-| 方法 | 执行成功 | EASY | NON-NESTED | NESTED | 总匹配 | 平均调用数 | 平均 token | 平均耗时 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Baseline（历史） | 30/30 | 10/10 | 6/10 | 9/10 | 25/30 | 待核实 | 待核实 | 待核实 |
-| DIN-SQL（历史） | 30/30 | 10/10 | 8/10 | 9/10 | 27/30 | 待核实 | 待核实 | 待核实 |
-| MAC-SQL 学习版 | 待测 | 待测 | 待测 | 待测 | 待测 | 待测 | 待测 | 待测 |
-| 关闭 Selector | 待测 | 待测 | 待测 | 待测 | 待测 | 待测 | 待测 | 待测 |
-| 关闭 Refiner | 待测 | 待测 | 待测 | 待测 | 待测 | 待测 | 待测 | 待测 |
+| 方法             | 执行成功 | EASY  | NON-NESTED | NESTED | 总匹配 | 平均调用数 | 平均 token | 平均耗时 |
+| ---------------- | -------- | ----- | ---------- | ------ | ------ | ---------- | ---------- | -------- |
+| Baseline（历史） | 30/30    | 10/10 | 6/10       | 9/10   | 25/30  | 待核实     | 待核实     | 待核实   |
+| DIN-SQL（历史）  | 30/30    | 10/10 | 8/10       | 9/10   | 27/30  | 待核实     | 待核实     | 待核实   |
+| MAC-SQL 学习版   | 待测     | 待测  | 待测       | 待测   | 待测   | 待测       | 待测       | 待测     |
+| 关闭 Selector    | 待测     | 待测  | 待测       | 待测   | 待测   | 待测       | 待测       | 待测     |
+| 关闭 Refiner     | 待测     | 待测  | 待测       | 待测   | 待测   | 待测       | 待测       | 待测     |
 
 15 道新题另列一张表。不要把历史成绩、调试题和新题混成一个不明分母的百分比。
 
@@ -381,13 +384,13 @@ Selector 自身也消耗 token，所以 Schema 变短不等于总费用下降。
 
 ## 9. 今天的 90 分钟，从这里开始
 
-| 时间 | 任务 | 当场产物 |
-| --- | --- | --- |
-| 0–15 分钟 | 阅读论文 Figure 2、Algorithm 1，浏览第 3 节 | 一句话写出三个角色的职责 |
-| 15–35 分钟 | 阅读 `ChatManager.start` 和 `_chat_single_round` | 画出 `send_to` 的变化 |
-| 35–60 分钟 | 阅读三个 `talk` 方法，只跟踪字段 | 输入/输出/下一跳表 |
-| 60–75 分钟 | 看 `_is_need_prune`、`_is_need_refine` 和 SQL 解析函数 | 写下三个“实际行为与直觉不同”的发现 |
-| 75–90 分钟 | 挑原 EASY 题和 JOIN 题，手工走一次流程 | 两条预期运行轨迹 |
+| 时间        | 任务                                                      | 当场产物                             |
+| ----------- | --------------------------------------------------------- | ------------------------------------ |
+| 0–15 分钟  | 阅读论文 Figure 2、Algorithm 1，浏览第 3 节               | 一句话写出三个角色的职责             |
+| 15–35 分钟 | 阅读`ChatManager.start` 和 `_chat_single_round`       | 画出`send_to` 的变化               |
+| 35–60 分钟 | 阅读三个`talk` 方法，只跟踪字段                         | 输入/输出/下一跳表                   |
+| 60–75 分钟 | 看`_is_need_prune`、`_is_need_refine` 和 SQL 解析函数 | 写下三个“实际行为与直觉不同”的发现 |
+| 75–90 分钟 | 挑原 EASY 题和 JOIN 题，手工走一次流程                    | 两条预期运行轨迹                     |
 
 今天完成后，能够回答这四个问题就进入单题运行：
 
