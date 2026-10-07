@@ -23,3 +23,5 @@ dev_databases.zip
 train_databases/
 database/
 *.sqlite
+/LEARNING_GUIDE.md
+/prepare_one.py
