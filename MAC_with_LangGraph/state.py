@@ -9,6 +9,7 @@ class SQLState(TypedDict, total = False):
 
     sql: str
     execution: dict[str, Any]
+    error: str | None
 
     retry_count: int
     max_retries: int

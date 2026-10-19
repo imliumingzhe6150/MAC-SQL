@@ -1,5 +1,6 @@
 import sqlite3
 import re
+import time
 from .state import SQLState
 from pathlib import Path
 from typing import Literal
@@ -56,7 +57,7 @@ def select_schema(state: SQLState) -> dict[str, str]:
 
 
 
-def generate_sql(state: SQLState) -> dict[str, str]:
+def generate_sql(state: SQLState) -> dict:
     prompt = f"""
 你负责将用户问题转换为 SQLite 查询。
 
@@ -94,11 +95,27 @@ def execute_sql(state: SQLState) -> dict:
     ) 
 
     connection = None
+    timeout_seconds = 5.0
+    timed_out = False
 
     try:
         connection = sqlite3.connect(
             database_path.as_uri() + "?mode=ro", uri=True
         )
+
+        deadline = time.monotonic() + timeout_seconds
+
+        def check_timeout():
+            nonlocal timed_out
+
+            if time.monotonic() >= deadline:
+                timed_out = True
+                return 1  # 通知 SQLite 中断查询
+
+            return 0  # 继续执行
+
+        connection.set_progress_handler(check_timeout, 1000)
+
         cursor = connection.execute(state["sql"])
         rows = cursor.fetchall()
         columns = [description[0] for description in cursor.description]
@@ -117,7 +134,11 @@ def execute_sql(state: SQLState) -> dict:
                 "success": False,
                 "columns": [],
                 "rows": [],
-                "error": str(e),
+                "error": (
+                    f"SQL 查询超时（{timeout_seconds} 秒）"
+                    if timed_out
+                    else str(e)
+                ),
             }
         }
     finally:

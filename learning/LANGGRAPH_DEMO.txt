@@ -1,0 +1,7 @@
+生成的 SQL： SELECT c.concert_Name, c.Theme, COUNT(sic.Singer_ID) AS number_of_singers
+FROM concert c
+LEFT JOIN singer_in_concert sic ON c.concert_ID = sic.concert_ID
+GROUP BY c.concert_ID, c.concert_Name, c.Theme;
+执行结果： {'success': True, 'columns': ['concert_Name', 'Theme', 'number_of_singers'], 'rows': [('Auditions', 'Free choice', 3), ('Super bootcamp', 'Free choice 2', 2), ('Home Visits', 'Bleeding Love', 1), ('Week 1', 'Wide Awake', 1), ('Week 1', 'Happy Tonight', 2), ('Week 2', 'Party All Night', 1)], 'error': None}
+最终状态： succeeded
+最终回答： Query executed successfully. Result: [('Auditions', 'Free choice', 3), ('Super bootcamp', 'Free choice 2', 2), ('Home Visits', 'Bleeding Love', 1), ('Week 1', 'Wide Awake', 1), ('Week 1', 'Happy Tonight', 2), ('Week 2', 'Party All Night', 1)]
