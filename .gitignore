@@ -1,27 +1,32 @@
-.DS_Store
+# Local Python environments and generated files
+.venv/
+.venv-*/
+venv/
 __pycache__/
-*/__pycache__/
-tmp/
-*.pyc
+*.py[cod]
+.pytest_cache/
+
+# Local credentials, editor settings and scratch files
+.env
+.env.*
+!.env.example
+.DS_Store
 .idea/
 .vscode/
-core/magic.api.py
-core/magic.config.json
-outputs/
-sql-llama-train/
-test.py
-api.py
-ooo-api.py
-baseline/
 tmp/
 misc/
+
+# Datasets and experiment outputs are kept locally
+outputs/
 data/bird/
 data/spider/
 data/foo/
+*.sqlite
 dev_databases/
 dev_databases.zip
 train_databases/
 database/
-*.sqlite
-/LEARNING_GUIDE.md
-/prepare_one.py
+
+# Personal study notes remain local after archival
+/learning/archive/macsql/LEARNING_GUIDE.md
+/learning/LANGGRAPH_PROGRESS_2026-10-18.md

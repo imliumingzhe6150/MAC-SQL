@@ -6,7 +6,7 @@
 
 ## 1. 一页流程图
 
-![MAC-SQL 阶段 A 流程图](</Users/liumingzhe/Desktop/Learning Agent/MAC-SQL/learning/stage_a_flowchart.png>)
+![MAC-SQL 阶段 A 流程图](stage_a_flowchart.png)
 
 这张图画的是官方代码的正常主路径。三个 Agent 共享同一个消息字典，Agent 修改 `send_to`，ChatManager 负责实际调用。解析错误退出和原版异常分支的问题见第 4 节。
 

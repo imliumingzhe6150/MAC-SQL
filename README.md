@@ -1,31 +1,68 @@
-## 📖Introduction
+# LangGraph SQL 查询工作流
 
-This is the official repository for the paper [&#34;MAC-SQL: A Multi-Agent Collaborative Framework for Text-to-SQL&#34;](https://arxiv.org/abs/2312.11242).
+个人学习项目：参考 MAC-SQL 的角色职责，用 LangGraph 实现“自然语言问题 → SQL → SQLite 查询结果”，后续扩展业务口径检索和工具调用。
 
-In this paper, we propose a multi-agent collaborative Text-to-SQL framework MAC-SQL, which comprises three agents: the **Selector**, the **Decomposer**, and the **Refiner**.
+## 当前能力
 
-<img src="./assets/framework.jpg" align="middle" width="95%">
+- 读取数据库表结构与外键，调用 DeepSeek 生成 SQL。
+- 使用 SQLite 只读连接执行查询，每次查询设置约 5 秒的执行时限。
+- 执行报错后修正 SQL，最多修正 3 次；每版修正 SQL 都重新执行。
+- 提供单题命令行入口与固定 30 题回归入口。
 
-## 🧪 本地学习复现：DeepSeek + Spider
+2026-10-18 的固定开发／回归集结果：**执行成功 30/30，结果匹配 29/30（96.7%）**。该轮未触发修正；提示词和模型条件未完全控制，结果变化不能单独归因于 LangGraph。SQL 执行成功也不代表语义正确。
 
-> 本节记录个人学习环境中的小样本复现，不是 MAC-SQL 论文的官方实验结果。
+## 快速开始
 
-本实验使用同一 DeepSeek 模型，对比直接生成 SQL 的 baseline、基于 DIN-SQL 四阶段思路的简化实现，以及当前 MAC-SQL 完整流程。
+在项目根目录使用 Python 3.12 环境：
 
-### 实验设置
+```bash
+python3.12 -m venv .venv-langgraph
+source .venv-langgraph/bin/activate
+python -m pip install -r requirements.txt
+```
 
-- 数据集：Spider dev 中固定的 30 道题，输入见 `data/spider/macsql_30.json`。
-- 题型分组：EASY、NON-NESTED、NESTED 各 10 道。这是按 Gold SQL 结构预先划分的学习分组，不是 Spider 官方难度标签。
-- 公平性：三种方法使用同一批题、同一数据库和同一模型。
-- 评测：在本地 SQLite 中分别执行预测 SQL 和 Gold SQL。有 `ORDER BY` 时比较行顺序；无排序要求时忽略行顺序，但保留重复行的计数。
-- 当前 MAC-SQL 的 Spider `Decomposer` 提示词直接生成最终 SQL，不要求显式输出多个子问题。
+已有可用的独立环境时，可直接使用该环境，不必重新创建。API Key 从 `DEEPSEEK_API_KEY` 读取，未设置时由运行入口提示隐藏输入。
 
-### 实验结果
+准备本地 Spider 数据后运行：
 
-| 方法                       |    执行成功率 | EASY 结果匹配 | NON-NESTED 结果匹配 | NESTED 结果匹配 |   总结果匹配率 | 模型调用次数 |
-| -------------------------- | ------------: | ------------: | ------------------: | --------------: | -------------: | -----------: |
-| Baseline                   | 30/30（100%） |         10/10 |                6/10 |            9/10 | 25/30（83.3%） |        约 30 |
-| DIN-SQL 简化实现（修正后） | 30/30（100%） |         10/10 |                8/10 |            9/10 | 27/30（90.0%） |       约 120 |
-| MAC-SQL（当前完整流程）    | 30/30（100%） |         10/10 |                9/10 |            9/10 | 28/30（93.3%） |           30 |
+```bash
+# 单题示例：修改 graph.py 中 initial_state 的 question 和 db_id
+python -m MAC_with_LangGraph.graph
 
-DIN-SQL 的调用次数按 Schema Linking、Classification / Decomposition、SQL Generation 和 Self-Correction 四个固定阶段推算。MAC-SQL 的 30 次调用来自 `api_trace.json` 的实际记录；共使用 45,901 个 prompt tokens 和 12,532 个 response tokens，合计 58,433 tokens。
+# 查看回归参数，不调用模型
+python -m MAC_with_LangGraph.regression --help
+
+# 完整 30 题：调用模型，并比较历史预测
+python -m MAC_with_LangGraph.regression
+```
+
+单题需要 `data/spider/database/<db_id>/<db_id>.sqlite`。完整回归还需要 `data/spider/macsql_30.json`、`outputs/macsql_30/results.jsonl`，以及本项目同级 `din-sql/results/` 中的历史预测。数据、运行输出和虚拟环境不纳入 Git，克隆仓库后需要单独准备。
+
+## 项目结构
+
+```text
+MAC_with_LangGraph/               当前实现、回归脚本与详细使用说明
+data/                            本地数据
+outputs/                         本地实验记录
+learning/LANGGRAPH_DEMO.txt       单题演示输出
+learning/archive/macsql/          原 MAC-SQL 阶段学习笔记与历史实验说明
+NEXT_STEP_LANGGRAPH_PROJECT.md    原项目路线及当前范围说明
+requirements.txt                 当前 LangGraph 依赖
+```
+
+- [详细运行说明与结果分析](MAC_with_LangGraph/README.md)
+- [单题演示输出](learning/LANGGRAPH_DEMO.txt)
+- [项目路线](NEXT_STEP_LANGGRAPH_PROJECT.md)
+- [旧阶段学习记录](learning/archive/macsql/README.md)
+
+## 第一阶段范围
+
+当前实现保留全部小型 Schema，直接生成最终 SQL。单题模型调用异常直接抛出，由运行者处理；批量回归将单题异常记录为失败后继续。暂不增加 token 统计或完整节点日志。
+
+下一阶段再增加业务口径 RAG、模型自主选择工具等能力。2026-10-18 的原始结果保留在本地 `outputs/langgraph_30_20261018_175344_798075/`。
+
+## 旧代码与来源
+
+2026-10-19 已清理当前实现不再依赖的旧 `core/`、评测器、训练脚本、Web 演示及旧启动入口。[清理前提交](https://github.com/imliumingzhe6150/MAC-SQL/tree/1ad71be68fbf8a9545a2fedf1fef4c18bea002e2)仍保留原代码，可用于查阅或恢复；旧学习记录已归档，数据与历史结果保留在本地。
+
+参考论文：[MAC-SQL: A Multi-Agent Collaborative Framework for Text-to-SQL](https://arxiv.org/abs/2312.11242)。

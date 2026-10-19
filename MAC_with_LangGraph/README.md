@@ -1,7 +1,7 @@
 
 # LangGraph SQL 查询工作流
 
-
+参考 MAC-SQL 的角色职责实现的个人学习项目。环境安装与目录总览见[项目首页](../README.md)。
 
 当前支持：
 
@@ -18,16 +18,16 @@
 
 ```mermaid
 flowchart TD
-    start([开始]) --> schema[准备或筛选 Schema]
-    schema --> generate[生成 SQL]
-    generate --> execute[只读执行 SQL]
-    execute --> route{检查执行结果}
-    route -->|执行成功| success[整理结果与执行证据]
-    route -->|可修正错误且未到上限| refine[依据错误修正 SQL]
+    start([START]) --> schema[select_schema：读取完整 Schema]
+    schema --> generate[generate_sql：生成 SQL]
+    generate --> execute[execute_sql：只读执行与超时检查]
+    execute --> route{执行成功？}
+    route -->|是| finish[finish：整理状态和回答]
+    route -->|否| budget{还有修正次数？}
+    budget -->|有| refine[refine_sql：根据执行错误修正]
     refine --> execute
-    route -->|达到上限或不可恢复错误| failure[保存失败原因]
-    success --> finish([结束])
-    failure --> finish
+    budget -->|没有| finish
+    finish --> endNode([END])
 ```
 
 
@@ -57,8 +57,10 @@ flowchart TD
 如需在另一个 Python 3.12 环境安装主要依赖：
 
 ```bash
-python -m pip install "langgraph==1.2.15" "langchain-deepseek==1.1.1"
+python -m pip install -r requirements.txt
 ```
+
+以上安装命令在项目根目录执行。原项目内的 Python 3.14 `.venv` 已清理；当前可用的 Academy 环境保持不变。
 
 默认模型为 `deepseek-flash`，temperature 为 0，关闭思考模式。
 可以通过环境变量 `DEEPSEEK_MODEL` 修改模型名称。
@@ -131,8 +133,9 @@ outputs/langgraph_30_20261018_175344_798075/
 
 该轮评测早于查询超时功能；超时功能已另行完成本地验证。
 
-详细记录见：
-[项目进度与错误分析](../learning/LANGGRAPH_PROGRESS_2026-10-18.md)。
+详细本地记录：`learning/LANGGRAPH_PROGRESS_2026-10-18.md`，作为个人笔记保留，不纳入 Git。
+
+每轮回归输出 `results.jsonl`、`summary.json` 和 `report.md`；这些文件保存在本地 `outputs/`，不会随代码推送。
 
 ## 6. 当前范围与限制
 

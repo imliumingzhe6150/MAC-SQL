@@ -1,8 +1,13 @@
 # 下一阶段项目说明：用 LangGraph 重构 MAC-SQL，并逐步扩展为数据分析 Agent
 
-更新日期：2026-10-13
+原规划日期：2026-10-13；当前状态说明更新于 2026-10-19。
 适用起点：已完成 MAC-SQL 学习与小样本复现，已学完 LangGraph Academy Module 1、2。
-当前阶段：项目规划；本文描述的 `langgraph_app/` 等新增模块尚未实现。
+
+> 当前实现为 `MAC_with_LangGraph/`，已完成查询流程、约 5 秒 SQL 执行时限、最多 3 次修正、单题演示和正式回归入口。沿用 2026-10-18 的 29/30 历史结果。
+>
+> 第一阶段按当前约定收尾：模型调用异常由运行者排查，暂缓 token 统计、完整节点日志及统一异常出口；不再把这些原规划项目作为进入下一阶段的前置要求。下一阶段为业务口径 RAG。
+>
+> 2026-10-19 清理后，旧 `core/`、评测器和训练／演示脚本已移出当前目录，可在[清理前提交](https://github.com/imliumingzhe6150/MAC-SQL/tree/1ad71be68fbf8a9545a2fedf1fef4c18bea002e2)查阅。旧笔记见 [learning/archive/macsql/](learning/archive/macsql/README.md)。下文保留原始规划，旧路径和未勾选清单不代表当前进度；实际运行以 [README](README.md) 为准。
 
 ## 1. 现在要做的项目
 
