@@ -21,6 +21,7 @@ outputs/
 data/bird/
 data/spider/
 data/foo/
+data/retail_ops/raw/
 *.sqlite
 dev_databases/
 dev_databases.zip

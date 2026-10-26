@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "created_date": "2026-10-26",
+  "split": "dev",
+  "question_count": 20,
+  "category_counts": {
+    "single_document": 6,
+    "cross_document": 4,
+    "version_time": 3,
+    "hybrid": 4,
+    "boundary": 3
+  },
+  "knowledge_root": "knowledge/retail_ops",
+  "knowledge_sha256": {
+    "knowledge/retail_ops/guides/join_and_metrics_faq.md": "1bf58f0ccd90718227114b618b0cdd444f5724e3dd8fea221884ae44d4a45f9d",
+    "knowledge/retail_ops/metrics/delivered_item_amount_v1.md": "48e4abfc5f3cf9bbaa90b28eeef1e598e87b2fb8ac60af1b9b5253a2a08003c7",
+    "knowledge/retail_ops/metrics/delivered_order_late_rate_v1.md": "80e4f6c4a27812178b9d6cc63984c5766a20742b01fdaa08aefda7edeadea35f",
+    "knowledge/retail_ops/metrics/delivery_duration_v1.md": "dc58e7d81e49b99ffaad25bdb41cf7044d361065388c0852ff8956c334526e87",
+    "knowledge/retail_ops/metrics/order_review_score_v1.md": "cc6073eea23ec948da75e782ce0ad54439e28333def30862ad30ea674cceb6af",
+    "knowledge/retail_ops/metrics/payment_record_amount_v1.md": "234fb332eb0ab00a962bebb602efe73ddabf489b3234e3a3e3fb6b4c1c147f85",
+    "knowledge/retail_ops/overview/source_and_scope.md": "e930b8047aee2c454db34cab3642238f04012294ea557567a18015022a6abe49",
+    "knowledge/retail_ops/schema/dimensions.md": "80e9c74893c6badf0bfb6d4281773d097715e781bfe3813476a6a840c98761c5",
+    "knowledge/retail_ops/schema/order_items.md": "b31784f33d41c8b764fc45728b2063c11bcb30513dcf7e1438663e809ea6c6bb",
+    "knowledge/retail_ops/schema/order_payments.md": "60d30b25112701185777ae6b2d37c20e8458686b86ef8d067bebcd89355b6409",
+    "knowledge/retail_ops/schema/order_reviews.md": "ec932c12f29546c0fd9685f037dc4093f2f2c3ac568a548ee8be6ffb1ff28340",
+    "knowledge/retail_ops/schema/orders.md": "faa596fab107b26b1164ad3963c71cc9ce2a75bda772b0267d7a0ea92b408692"
+  },
+  "db_snapshot": "archive_sha256:967e41e04fc306fe604e2a693f488995a8b41e5047418f8a5c8e4abd6deca784",
+  "data_scope": "full_olist_v2_snapshot",
+  "family_policy": "All variants in a family stay in dev; future independent test questions must use other families.",
+  "files_sha256": {
+    "questions.jsonl": "75a1ceec638beafd2f70c28c6cbcfbb3182e449a112405272cf8be66575d1a86",
+    "gold.jsonl": "941146aa2fb2c113a0e8d757aebf7916af46c3cffe48f2505fc7f818b5321cd2",
+    "DEV_QUESTIONS.md": "d9595ea3804f6799a1c83c37ac735b3a69e67034d9453d0db9636a7b8c52999f"
+  },
+  "numeric_reference_sha256": "0bf06e12ffac1e65078cedd534dd433900d9e33dc3f066e4ac6c5c7749298f99",
+  "not_yet_covered": [
+    "actual_v1_v2_comparison",
+    "conflicting_documents",
+    "identity_isolation",
+    "document_injection",
+    "zero_denominator_numeric_fixture",
+    "sample_30_to_50_orders"
+  ],
+  "revised_date": "2026-10-26",
+  "revision_note": "17 everyday-language questions; 3 technical version/time probes. Numeric scopes and verified results unchanged. Added explicit plain-language presentation criteria; refund boundary replaced by profit boundary.",
+  "language_style_counts": {
+    "everyday_language": 17,
+    "technical_boundary_probe": 3
+  }
+}

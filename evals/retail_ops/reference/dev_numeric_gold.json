@@ -1,0 +1,154 @@
+{
+  "created_date": "2026-10-26",
+  "scope": "full_olist_v2_snapshot",
+  "db_snapshot": "archive_sha256:967e41e04fc306fe604e2a693f488995a8b41e5047418f8a5c8e4abd6deca784",
+  "parameters": {
+    "period_start": "2018-01-01 00:00:00",
+    "period_end": "2018-02-01 00:00:00",
+    "customer_state": null
+  },
+  "data_as_of": null,
+  "verification": "All four SQL outputs matched independent raw-CSV Python computations",
+  "knowledge_sha256": {
+    "knowledge/retail_ops/guides/join_and_metrics_faq.md": "1bf58f0ccd90718227114b618b0cdd444f5724e3dd8fea221884ae44d4a45f9d",
+    "knowledge/retail_ops/metrics/delivered_item_amount_v1.md": "48e4abfc5f3cf9bbaa90b28eeef1e598e87b2fb8ac60af1b9b5253a2a08003c7",
+    "knowledge/retail_ops/metrics/delivered_order_late_rate_v1.md": "80e4f6c4a27812178b9d6cc63984c5766a20742b01fdaa08aefda7edeadea35f",
+    "knowledge/retail_ops/metrics/delivery_duration_v1.md": "dc58e7d81e49b99ffaad25bdb41cf7044d361065388c0852ff8956c334526e87",
+    "knowledge/retail_ops/metrics/order_review_score_v1.md": "cc6073eea23ec948da75e782ce0ad54439e28333def30862ad30ea674cceb6af",
+    "knowledge/retail_ops/metrics/payment_record_amount_v1.md": "234fb332eb0ab00a962bebb602efe73ddabf489b3234e3a3e3fb6b4c1c147f85",
+    "knowledge/retail_ops/overview/source_and_scope.md": "e930b8047aee2c454db34cab3642238f04012294ea557567a18015022a6abe49",
+    "knowledge/retail_ops/schema/dimensions.md": "80e9c74893c6badf0bfb6d4281773d097715e781bfe3813476a6a840c98761c5",
+    "knowledge/retail_ops/schema/order_items.md": "b31784f33d41c8b764fc45728b2063c11bcb30513dcf7e1438663e809ea6c6bb",
+    "knowledge/retail_ops/schema/order_payments.md": "60d30b25112701185777ae6b2d37c20e8458686b86ef8d067bebcd89355b6409",
+    "knowledge/retail_ops/schema/order_reviews.md": "ec932c12f29546c0fd9685f037dc4093f2f2c3ac568a548ee8be6ffb1ff28340",
+    "knowledge/retail_ops/schema/orders.md": "faa596fab107b26b1164ad3963c71cc9ce2a75bda772b0267d7a0ea92b408692"
+  },
+  "sql_sha256": {
+    "delivered_order_late_rate_v1.sql": "2ae8901d4b818cf32f4125642d77bdae0067657f17d0c40fb96098f70c53a5ac",
+    "dev_item_amount.sql": "5c311ea5db21799d52af46a97393da1efaa55d3f2a16d14830c3a77b2bdb7900",
+    "dev_payment_amount.sql": "fb72c1b101b3b0d3bdf390e93ee0aba7910ea821df54a7fa6c6a528ca0f60c23",
+    "dev_review_score.sql": "8fdcbb8aa0b4d8bf581c92fb6908154d0a38507e0f85ca8d54a512c42a67b82a"
+  },
+  "reference_sql": {
+    "dev014": "delivered_order_late_rate_v1.sql",
+    "dev015": "dev_item_amount.sql",
+    "dev016": "dev_payment_amount.sql",
+    "dev017": "dev_review_score.sql"
+  },
+  "results": {
+    "dev014": [
+      {
+        "customer_state": "RJ",
+        "cohort_order_count": 893,
+        "eligible_order_count": 850,
+        "late_order_count": 111,
+        "excluded_order_count": 43,
+        "not_delivered": 43,
+        "invalid_delivery_time": 0,
+        "invalid_time_order": 0,
+        "late_rate": 0.13058823529411764,
+        "late_rate_display": "13.06%"
+      },
+      {
+        "customer_state": "SP",
+        "cohort_order_count": 3052,
+        "eligible_order_count": 2975,
+        "late_order_count": 102,
+        "excluded_order_count": 77,
+        "not_delivered": 77,
+        "invalid_delivery_time": 0,
+        "invalid_time_order": 0,
+        "late_rate": 0.03428571428571429,
+        "late_rate_display": "3.43%"
+      }
+    ],
+    "dev015": [
+      {
+        "cohort_order_count": 3052,
+        "delivered_order_count": 2975,
+        "valid_item_count": 3379,
+        "contributing_order_count": 2975,
+        "missing_item_order_count": 0,
+        "invalid_item_count": 0,
+        "amount_cents": 36861143,
+        "amount_brl_display": "368611.43"
+      }
+    ],
+    "dev016": [
+      {
+        "payment_type": "boleto",
+        "payment_record_count": 1518,
+        "matched_order_count": 1518,
+        "invalid_payment_count": 0,
+        "amount_cents": 20484466,
+        "cohort_order_count": 7269,
+        "missing_payment_order_count": 0,
+        "amount_brl_display": "204844.66"
+      },
+      {
+        "payment_type": "credit_card",
+        "payment_record_count": 5520,
+        "matched_order_count": 5511,
+        "invalid_payment_count": 0,
+        "amount_cents": 86888038,
+        "cohort_order_count": 7269,
+        "missing_payment_order_count": 0,
+        "amount_brl_display": "868880.38"
+      },
+      {
+        "payment_type": "debit_card",
+        "payment_record_count": 109,
+        "matched_order_count": 109,
+        "invalid_payment_count": 0,
+        "amount_cents": 1154355,
+        "cohort_order_count": 7269,
+        "missing_payment_order_count": 0,
+        "amount_brl_display": "11543.55"
+      },
+      {
+        "payment_type": "voucher",
+        "payment_record_count": 416,
+        "matched_order_count": 304,
+        "invalid_payment_count": 0,
+        "amount_cents": 2973559,
+        "cohort_order_count": 7269,
+        "missing_payment_order_count": 0,
+        "amount_brl_display": "29735.59"
+      }
+    ],
+    "dev017": [
+      {
+        "customer_state": "RJ",
+        "target_order_count": 850,
+        "reviewed_order_count": 840,
+        "low_score_order_count": 180,
+        "score_sum": 3241,
+        "no_review_order_count": 10,
+        "only_invalid_review_order_count": 0,
+        "multiple_candidate_order_count": 7,
+        "mean_score": 3.8583333333333334,
+        "mean_score_display": "3.86",
+        "low_score_rate": 0.21428571428571427,
+        "low_score_rate_display": "21.43%",
+        "review_coverage_rate": 0.9882352941176471,
+        "review_coverage_rate_display": "98.82%"
+      },
+      {
+        "customer_state": "SP",
+        "target_order_count": 2975,
+        "reviewed_order_count": 2956,
+        "low_score_order_count": 352,
+        "score_sum": 12387,
+        "no_review_order_count": 19,
+        "only_invalid_review_order_count": 0,
+        "multiple_candidate_order_count": 13,
+        "mean_score": 4.190460081190798,
+        "mean_score_display": "4.19",
+        "low_score_rate": 0.11907983761840325,
+        "low_score_rate_display": "11.91%",
+        "review_coverage_rate": 0.9936134453781512,
+        "review_coverage_rate_display": "99.36%"
+      }
+    ]
+  }
+}
